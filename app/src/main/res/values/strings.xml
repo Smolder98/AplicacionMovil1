@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PrimeraAplicacion</string>
+    <string name="btn_saludar">Saludar</string>
+    <string name="btn_secundaria">Pantalla Secundaria</string>
+    <string name="txt_regresar">Regresar</string>
+
+
+</resources>
