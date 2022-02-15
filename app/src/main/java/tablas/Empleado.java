@@ -7,16 +7,28 @@ public class Empleado {
     private String apellidos;
     private int edad;
     private String correo;
+    private byte[] imagen;
 
-    public Empleado(int codigo, String nombres, String apellidos, int edad, String correo) {
+
+
+    public Empleado(int codigo, String nombres, String apellidos, int edad, String correo, byte[] imagen) {
         this.codigo = codigo;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.edad = edad;
         this.correo = correo;
+        this.imagen = imagen;
     }
 
     public Empleado() {
+    }
+
+    public byte[] getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
     }
 
     public int getCodigo() {
