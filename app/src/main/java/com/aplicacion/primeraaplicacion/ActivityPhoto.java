@@ -1,13 +1,20 @@
 package com.aplicacion.primeraaplicacion;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.ActivityResultRegistry;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.MutableLiveData;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -35,7 +42,9 @@ public class ActivityPhoto extends AppCompatActivity {
     static final int PETICION_ACCESO_CAM = 100; // Cualquier numero y tiene que ser entero
     static final int TAKE_PIC_REQUEST = 101;
 
-    @Override
+    ActivityResultLauncher<Intent> someActivityResultLauncher;
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
@@ -53,6 +62,27 @@ public class ActivityPhoto extends AppCompatActivity {
         });
 
 
+        someActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+
+
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // There are no request codes
+                            Intent data = result.getData();
+//
+
+                            Bundle extras = data.getExtras();
+
+                            Bitmap imagen = (Bitmap) extras.get("data");
+
+                            objImagen.setImageBitmap(imagen);
+                        }
+                    }
+                });
+
 
 
     }
@@ -62,8 +92,8 @@ public class ActivityPhoto extends AppCompatActivity {
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PETICION_ACCESO_CAM);
         }else {
-//            tomarFoto();
-            dispatchTakePictureIntent();
+            tomarFoto();
+//            dispatchTakePictureIntent();
 
 
         }
@@ -75,8 +105,8 @@ public class ActivityPhoto extends AppCompatActivity {
 
         if(requestCode == PETICION_ACCESO_CAM){
             if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-//                tomarFoto();
-                dispatchTakePictureIntent();
+               tomarFoto();
+//                dispatchTakePictureIntent();
 
 
             }
@@ -93,7 +123,9 @@ public class ActivityPhoto extends AppCompatActivity {
 
         if(takepic.resolveActivity(getPackageManager()) != null){
 
-            startActivityForResult(takepic, TAKE_PIC_REQUEST);
+//            startActivityForResult(takepic, TAKE_PIC_REQUEST);
+
+            someActivityResultLauncher.launch(takepic);
         }
 
 
@@ -105,11 +137,11 @@ public class ActivityPhoto extends AppCompatActivity {
 
         if(requestCode == TAKE_PIC_REQUEST && resultCode == RESULT_OK){
 
+//            System.out.println("Entro");
 
+//            Intent inte = new Intent(getApplicationContext(), ActivityPhoto.class);
 
-            Intent inte = new Intent(getApplicationContext(), ActivityPhoto.class);
-
-            startActivity(inte);
+//            startActivity(inte);
 
 
             Bundle extras = data.getExtras();
@@ -157,9 +189,11 @@ public class ActivityPhoto extends AppCompatActivity {
           try {
               if (photoFile != null) {
                   Uri photoURI = FileProvider.getUriForFile(this,
-                          "com.aplicacion.primeraaplicacion.provider",
+                          "com.aplicacion.primeraaplicacion.fileprovider",
                           photoFile);
+
                   takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
                   startActivityForResult(takePictureIntent, TAKE_PIC_REQUEST);
               }
           }catch (Exception e){
